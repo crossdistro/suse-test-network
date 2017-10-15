@@ -1,0 +1,33 @@
+- hosts: all
+  become: yes
+  tasks:
+# Don't upgrade all so that we don't wait so much
+#    - name: refresh and update packages
+#      zypper: name=* state=dist-upgrade extra_args=--allow-vendor-change
+    - name: install packages
+      zypper: name={{ item }} type=package state=installed
+      with_items:
+        - net-tools
+        - strace
+        - ltrace
+# Configure and enable networkd based networking
+    - name: create resolv.conf symlink for resolved
+      file: dest=/etc/resolv.conf src=/run/systemd/resolve/resolv.conf state=link force=yes
+    - name: configure networkd
+      template: src=dhcp.network.j2 dest=/etc/systemd/network/50-dhcp-{{ item }}.network
+      vars:
+        interface_name: "{{ item }}"
+      with_items:
+        - eth0
+        - eth1
+#    - name: enable networkd and resolved
+#      systemd: name=systemd-{{ item }} state=restarted enabled=yes
+#      with_items:
+#        - networkd
+#        - resolved
+# Check networking
+#    - name: ping to host
+#      command: ping -n -c 1 192.0.2.1
+# Disable default networking
+#    - name: disable wicked
+#      systemd: name=wicked state=stopped enabled=no

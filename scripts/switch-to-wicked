@@ -1,0 +1,11 @@
+#!/bin/sh -xe
+
+for srv in networkd resolved; do
+    systemctl stop systemd-$srv
+done
+
+rm -f /etc/resolv.conf
+
+systemctl start wicked
+
+wicked ifstatus all

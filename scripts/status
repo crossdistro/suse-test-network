@@ -1,0 +1,11 @@
+#!/bin/bash
+SERVICES="
+    systemd-networkd
+    systemd-resolved
+    wicked
+    NetworkManager
+"
+
+for srv in $SERVICES; do
+    echo "$srv: $(systemctl is-active $srv)"
+done

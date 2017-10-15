@@ -1,0 +1,3 @@
+#!/bin/sh -xe
+
+ps -ef | grep -iE 'network|resolv|wicked'
