@@ -1,0 +1,76 @@
+#!/usr/bin/python
+
+from __future__ import print_function
+
+import os
+import sys
+from subprocess import call, check_call
+
+SERVICES = ["networkd", "wicked"]
+
+def systemctl_command(*args):
+    args = ["systemctl", "--quiet"] + list(args)
+    #print(args, file=sys.stderr)
+    return args
+
+def systemd_active(systemd_service):
+    return call(systemctl_command("is-active", systemd_service)) == 0
+
+def systemd_start(systemd_service):
+    check_call(systemctl_command("start", systemd_service))
+
+def systemd_stop(systemd_service):
+    check_call(systemctl_command("stop", systemd_service))
+
+def systemd_kill(systemd_service):
+    check_call(systemctl_command("kill", systemd_service))
+
+def detect_network_service():
+    if systemd_active("systemd-networkd"):
+        return "networkd"
+    if systemd_active("wickedd"):
+        return "wicked"
+
+def select_network_service(service):
+    old_service = detect_network_service()
+
+    if old_service:
+        globals()[old_service + "_stop"]()
+    globals()[service + "_start"]()
+
+def networkd_start():
+    try:
+        os.unlink("/etc/resolv.conf")
+    except OSError:
+        pass
+    os.symlink("/run/systemd/resolve/resolv.conf", "/etc/resolv.conf")
+    systemd_start("systemd-networkd")
+    systemd_start("systemd-resolved")
+
+def networkd_stop():
+    systemd_stop("systemd-networkd")
+    systemd_stop("systemd-resolved")
+    os.unlink("/etc/resolv.conf")
+
+def wicked_start():
+    systemd_start("wicked")
+
+def wicked_stop():
+    systemd_stop("wickedd")
+    systemd_kill("wicked")
+
+def run():
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--select", choices=SERVICES)
+
+    options = parser.parse_args()
+
+    if options.select:
+        select_network_service(options.select)
+        assert detect_network_service() == options.select
+    print(detect_network_service())
+
+if __name__ == '__main__':
+    run()
