@@ -10,6 +10,8 @@
         - net-tools
         - strace
         - ltrace
+        - NetworkManager
+        - man
 # Configure and enable networkd based networking
     - name: create resolv.conf symlink for resolved
       file: dest=/etc/resolv.conf src=/run/systemd/resolve/resolv.conf state=link force=yes
