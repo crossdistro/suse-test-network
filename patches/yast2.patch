@@ -1,0 +1,65 @@
+diff --git a/library/network/src/modules/NetworkService.rb b/library/network/src/modules/NetworkService.rb
+index bbc0b87a..c7b671e2 100644
+--- a/library/network/src/modules/NetworkService.rb
++++ b/library/network/src/modules/NetworkService.rb
+@@ -53,15 +53,17 @@ module Yast
+       # <internal-id>        <service name>
+       netconfig:       "network",
+       network_manager: "NetworkManager",
+-      wicked:          "wicked"
++      wicked:          "wicked",
++      networkd:        "systemd-networkd"
+     }.freeze
+ 
+     # network backend identification to its rpm package name mapping
+     BACKEND_PKG_NAMES = {
+-      # <internal-id>        <service name>
++      # <internal-id>        <package name>
+       netconfig:       "sysconfig-network",
+       network_manager: "NetworkManager",
+-      wicked:          "wicked"
++      wicked:          "wicked",
++      networkd:        "systemd"
+     }.freeze
+ 
+     SYSTEMCTL = "/bin/systemctl".freeze
+@@ -149,6 +151,12 @@ module Yast
+ 
+     alias_method :is_wicked, :wicked?
+ 
++    def networkd?
++      cached_service?(:networkd)
++    end
++
++    alias_method :is_networkd, :networkd?
++
+     def disabled?
+       cached_service?(nil)
+     end
+@@ -176,6 +184,13 @@ module Yast
+       nil
+     end
+ 
++    def use_networkd
++      Read()
++      @cached_name = :networkd
++
++      nil
++    end
++
+     # disables network service completely
+     def disable
+       @cached_name = nil
+@@ -438,10 +453,12 @@ module Yast
+     publish function: :is_network_manager, type: "boolean ()"
+     publish function: :is_netconfig, type: "boolean ()"
+     publish function: :is_wicked, type: "boolean ()"
++    publish function: :is_networkd, type: "boolean ()"
+     publish function: :is_disabled, type: "boolean ()"
+     publish function: :use_network_manager, type: "void ()"
+     publish function: :use_netconfig, type: "void ()"
+     publish function: :use_wicked, type: "void ()"
++    publish function: :use_networkd, type: "void ()"
+     publish function: :IsActive, type: "boolean ()"
+     publish function: :ReloadOrRestart, type: "void ()"
+     publish function: :Restart, type: "void ()"

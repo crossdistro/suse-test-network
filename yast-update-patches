@@ -1,0 +1,45 @@
+#!/usr/bin/python3
+
+import os
+import shutil
+import subprocess
+import yaml
+import argparse
+
+import logging
+logging.basicConfig(format="{message}", style="{", level=logging.DEBUG)
+log = logging.getLogger()
+
+repos = yaml.safe_load("""
+- git: yast-yast2
+  obs: yast2
+- git: yast-network
+  obs: yast2-network
+  reference: 6854df49232e965e04b63e3a2ce9b8018dfad134
+""")
+
+path = os.path.dirname(__file__)
+path_patches = os.path.join(path, "patches")
+
+def check_call(command, **kargs):
+    log.debug("Command: {}, kargs={}".format(command, kargs))
+    return subprocess.check_call(command, **kargs)
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--commit", action="store_true")
+options = parser.parse_args()
+
+for repo in repos:
+    git = os.path.join(path, repo['git'])
+    obs = os.path.join(path, "obs", "home:pavlix:Networking", repo['obs'])
+    reference = repo.get("reference", "HEAD")
+    os.makedirs(path_patches, exist_ok=True)
+    patch = os.path.join(path_patches, "{obs}.patch".format(**repo))
+    with open(patch, "w") as stream:
+        check_call(["git", "diff", reference, "--"], cwd=git, stdout=stream)
+
+    if options.commit:
+        shutil.copy(patch, os.path.join(obs, "pavlix-changes.patch"))
+        check_call(["osc", "update"], cwd=obs)
+        check_call(["osc", "add", "pavlix-changes.patch"], cwd=obs)
+        check_call(["osc", "commit", "-n"], cwd=obs)

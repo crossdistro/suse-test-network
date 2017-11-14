@@ -1,0 +1,28 @@
+diff --git a/src/include/network/widgets.rb b/src/include/network/widgets.rb
+index b1952bb3..9cc488c3 100644
+--- a/src/include/network/widgets.rb
++++ b/src/include/network/widgets.rb
+@@ -304,6 +304,14 @@ module Yast
+           NetworkService.is_wicked
+         )
+       end
++      if NetworkService.is_backend_available(:networkd)
++        items << Item(
++          Id("networkd"),
++          # networkd is network configuration backend like netconfig
++          _("systemd-networkd Service"),
++          NetworkService.is_networkd
++        )
++      end
+ 
+       items << Item(
+         Id("disabled"),
+@@ -330,6 +338,8 @@ module Yast
+         NetworkService.use_network_manager
+       when "wicked"
+         NetworkService.use_wicked
++      when "networkd"
++        NetworkService.use_networkd
+       else
+         NetworkService.disable
+       end
