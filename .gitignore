@@ -1,0 +1,9 @@
+/.vagrant
+/NetworkManager
+/obs
+/systemd
+/wicked
+/yast-network
+/yast-yast2
+
+__pycache__
