@@ -1,0 +1,18 @@
+#!/usr/bin/python3
+
+import os
+
+from common import log, check_call
+
+path = os.path.dirname(__file__)
+path_diffs = os.path.join(path, "obs-diffs")
+
+os.makedirs(path_diffs, exist_ok=True)
+
+repos = ["systemd", "yast2", "yast2-network"]
+for repo in repos:
+    obs = os.path.join(path, "obs", "home:pavlix:Networking", repo)
+    patch = os.path.join(path_diffs, "{}.diff".format(repo))
+
+    with open(patch, "w") as stream:
+        check_call(["osc", "diff", "--link"], cwd=obs, stdout=stream)

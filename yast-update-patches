@@ -2,13 +2,10 @@
 
 import os
 import shutil
-import subprocess
 import yaml
 import argparse
 
-import logging
-logging.basicConfig(format="{message}", style="{", level=logging.DEBUG)
-log = logging.getLogger()
+from common import log, check_call
 
 repos = yaml.safe_load("""
 - git: yast-yast2
@@ -20,10 +17,6 @@ repos = yaml.safe_load("""
 
 path = os.path.dirname(__file__)
 path_patches = os.path.join(path, "patches")
-
-def check_call(command, **kargs):
-    log.debug("Command: {}, kargs={}".format(command, kargs))
-    return subprocess.check_call(command, **kargs)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--commit", action="store_true")

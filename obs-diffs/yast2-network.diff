@@ -1,0 +1,56 @@
+diff working copy against last commited version
+
+Index: yast2-network.spec
+===================================================================
+--- yast2-network.spec	(revision b811d1b46df509969c7315ffca351397)
++++ yast2-network.spec	(working copy)
+@@ -23,6 +23,7 @@
+ 
+ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+ Source0:        %{name}-%{version}.tar.bz2
++Patch0:         pavlix-changes.patch
+ 
+ BuildRequires:  update-desktop-files
+ BuildRequires:  yast2-devtools >= 3.1.15
+@@ -76,6 +77,7 @@
+ 
+ %prep
+ %setup -n %{name}-%{version}
++%patch0 -p1
+ 
+ %check
+ rake test:unit
+Index: pavlix-changes.patch
+===================================================================
+--- pavlix-changes.patch	(revision 0)
++++ pavlix-changes.patch	(working copy)
+@@ -0,0 +1,28 @@
++diff --git a/src/include/network/widgets.rb b/src/include/network/widgets.rb
++index b1952bb3..9cc488c3 100644
++--- a/src/include/network/widgets.rb
+++++ b/src/include/network/widgets.rb
++@@ -304,6 +304,14 @@ module Yast
++           NetworkService.is_wicked
++         )
++       end
+++      if NetworkService.is_backend_available(:networkd)
+++        items << Item(
+++          Id("networkd"),
+++          # networkd is network configuration backend like netconfig
+++          _("systemd-networkd Service"),
+++          NetworkService.is_networkd
+++        )
+++      end
++ 
++       items << Item(
++         Id("disabled"),
++@@ -330,6 +338,8 @@ module Yast
++         NetworkService.use_network_manager
++       when "wicked"
++         NetworkService.use_wicked
+++      when "networkd"
+++        NetworkService.use_networkd
++       else
++         NetworkService.disable
++       end
+

@@ -1,0 +1,63 @@
+diff working copy against last commited version
+
+Index: systemd-mini.spec
+===================================================================
+--- systemd-mini.spec	(revision 1f0060d7f2ff80d201a88ea3f90f9c06)
++++ systemd-mini.spec	(working copy)
+@@ -44,7 +44,7 @@
+ %bcond_without  gnuefi
+ %endif
+ %endif
+-%bcond_with     resolved
++%bcond_without  resolved
+ %bcond_with     parentpathid
+ 
+ Name:           systemd-mini
+@@ -461,7 +461,7 @@
+ %endif
+         --disable-kdbus
+ 
+-%make_build V=e
++make %{?_smp_mflags}
+ 
+ %install
+ %make_install
+@@ -984,6 +984,7 @@
+ %dir %{_sysconfdir}/systemd
+ %dir %{_sysconfdir}/systemd/system
+ %dir %{_sysconfdir}/systemd/user
++%dir %{_sysconfdir}/systemd/network
+ %dir %{_sysconfdir}/xdg/systemd
+ %{_sysconfdir}/xdg/systemd/user
+ %{_sysconfdir}/X11/xinit/xinitrc.d/50-systemd-user.sh
+Index: systemd.spec
+===================================================================
+--- systemd.spec	(revision 1f0060d7f2ff80d201a88ea3f90f9c06)
++++ systemd.spec	(working copy)
+@@ -42,7 +42,7 @@
+ %bcond_without  gnuefi
+ %endif
+ %endif
+-%bcond_with     resolved
++%bcond_without  resolved
+ %bcond_with     parentpathid
+ 
+ Name:           systemd
+@@ -459,7 +459,7 @@
+ %endif
+         --disable-kdbus
+ 
+-%make_build V=e
++make %{?_smp_mflags}
+ 
+ %install
+ %make_install
+@@ -982,6 +982,7 @@
+ %dir %{_sysconfdir}/systemd
+ %dir %{_sysconfdir}/systemd/system
+ %dir %{_sysconfdir}/systemd/user
++%dir %{_sysconfdir}/systemd/network
+ %dir %{_sysconfdir}/xdg/systemd
+ %{_sysconfdir}/xdg/systemd/user
+ %{_sysconfdir}/X11/xinit/xinitrc.d/50-systemd-user.sh
+
