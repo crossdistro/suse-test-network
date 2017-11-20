@@ -1,5 +1,18 @@
 # Automation for testing SUSE network configuration stack
 
+## Modified packages and dependencies
+
+  * systemd
+      - Modified to also build resolved and better support networkd
+  * yast2, yast2-network
+      - Modified to attempt to switch between networkd and other stuff
+
+## Adding new packages to the home subproject
+
+    package=...
+
+    osc linkpac openSUSE:Factory $package home:pavlix:Networking
+
 ## Troubleshooting
 
 ### systemd-resolved service refuses to start
